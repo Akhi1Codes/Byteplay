@@ -14,6 +14,9 @@ export class SnakeGame implements Game {
   private food: Position = { x: 10, y: 10 };
 
   private intervalId: number | null = null;
+  private speed = 100; // 🔥 start speed (ms per move)
+  private minSpeed = 40; // 🔥 cap so it doesn’t get too fast
+
   private isGameOver = false;
   private isRunning = false;
   private score = 0;
@@ -44,14 +47,20 @@ export class SnakeGame implements Game {
     this.score = 0;
     this.isGameOver = false;
     this.isRunning = false;
+    this.speed = 100; // reset to default speed
     this.spawnFood();
+  }
+
+  private startLoop(): void {
+    this.stop();
+    this.intervalId = window.setInterval(() => this.update(), this.speed);
   }
 
   /** Private internal start logic */
   private startGame(): void {
     if (this.isRunning) return;
     this.isRunning = true;
-    this.intervalId = window.setInterval(() => this.update(), 100);
+    this.startLoop();
     this.overlay.hide();
   }
 
@@ -134,6 +143,10 @@ export class SnakeGame implements Game {
     if (head.x === this.food.x && head.y === this.food.y) {
       this.score++;
       this.spawnFood();
+
+      // 🔥 Increase speed after eating food
+      this.speed = Math.max(this.minSpeed, this.speed * 0.95); // 5% faster, capped
+      this.startLoop(); // restart interval with new speed
     } else {
       this.snake.pop();
     }
@@ -158,18 +171,15 @@ export class SnakeGame implements Game {
     this.overlay.showGameOver(this.score);
   }
 
-  // This is the new, main render loop.
-  // It handles the initial screen, game over screen, and in-game rendering.
   public render(): void {
     if (this.isRunning) {
       this.draw();
     } else if (this.isGameOver) {
       this.overlay.showGameOver(this.score);
     } else {
-      // Show start overlay when not running and not game over
       this.overlay.showStart();
     }
-    
+
     requestAnimationFrame(() => this.render());
   }
 

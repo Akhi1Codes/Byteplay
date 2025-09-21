@@ -9,10 +9,10 @@
 <div id="snake-container" style="width: 100%; height: 80vh;"></div>
 
 <script type="module">
-import { SnakeGame } from "../dist/index.js";
+import { PaddleGame } from "../dist/index.js";
 
 const container = document.getElementById("snake-container");
-const game = new SnakeGame(container);
+const game = new PaddleGame(container);
 
 // This is the key change:
 // We call the `render` method, which displays the start screen.
